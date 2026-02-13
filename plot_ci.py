@@ -22,132 +22,82 @@ matplotlib.rcParams['hatch.linewidth'] = 2.0
 matplotlib.rcParams['lines.linewidth'] = 2.0
 har2ev = 27.2114
 
-enMin = 0
-enMax = 5
-res = .001
+enMin = 1.990
+enMax = 2.010
+res = .00001
 nPoints = int((enMax-enMin)/res)
 
 plots = []
-subPlots = []
 energy = []
-subEnergy = []
 
 fileList = [\
-            "Na_ci.log1", \
-            "Na_ci.log2", \
+            "nonRel/03_NaCI.log", \
+            "Scalar/03_NaCI.log", \
+            "SOC/03_NaCI.log", \
            ]
 
-subList  = [[\
-            "Na_ci.log2", \
-            ],[ \
-            ]]
-
-
 fchkList = [\
-            "Na_ci.fchk", \
-            "Na_ci.fchk", \
+            "nonRel/03_NaCI.fchk", \
+            "Scalar/03_NaCI.fchk", \
+            "SOC/03_NaCI.fchk", \
            ]
 
 names    = [\
-            "NaTest", \
-            "NaFull", \
-           ]
-
-shifts   = [\
-            0, \
-            0, \
+            "Non-Rel", \
+            "SF-X2C", \
+            "X2C", \
            ]
 
 for i, fl in enumerate(fileList):
   print("WORKING, ", fl, " [", i+1, "/", len(fileList), "]")
   plots.append(CI_spectra(fl, fchkList[i], None))
   
-  if len(subList[i]) > 0:
-    subs = []
-    for j, sbfl in enumerate(subList[i]):
-      print("SUB WORKING, ", sbfl, " [", j+1, "/", len(subList[i]), "]")
-      subs.append(CI_spectra(sbfl, fchkList[i], None))
-    subPlots.append(subs)
-  else:
-    subPlots.append(None)
-
 for i in range(len(fileList)):
   plots[i].decompose_byorbital()
   energy.append((plots[i].energy[0,:])*har2ev)
-  subs = []
-  for j in range(len(subList[i])):
-    subPlots[i][j].decompose_byorbital()
-    subs.append((subPlots[i][j].energy[0,:])*har2ev)
-  subEnergy.append(subs)
   print("Plots: ", names[i], " max: ", max(energy[-1]))
 
-space_names  = list(plots[0].spaces)
 for i in range(len(fileList)):
+  space_names  = list(plots[0].spaces)
   for space in range(len(space_names)):
     os = plots[i].decomp_byorbital[0, :, space]
     totEn = energy[i]
-    for j in range(len(subList[i])):
-      tmpEn = np.asarray(subEnergy[i][j])
-      idxEn = np.where(tmpEn > totEn[-1])
-      totEn = np.concatenate([totEn, tmpEn[idxEn]])
-      tmpOs = subPlots[i][j].decomp_byorbital[0, :, space]
-      os = np.concatenate([os, tmpOs[idxEn]])
-    plots[i].make_spectrum(space_names[space], shifts[i]-5, max(totEn), totEn, os, 0.14, npoints=nPoints)
+    plots[i].make_spectrum(space_names[space], enMin, enMax, totEn, os, 0.001, npoints=nPoints)
 
 space_names += ["Full Spectrum"]
-
 fullEn = [[0] for x in range(len(fileList))]
 fullOs = [[0] for x in range(len(fileList))]
 for i in range(len(fileList)):
   fullOs[i] = plots[i].oscstr[0]
   fullEn[i] = energy[i]
-  for j in range(len(subList[i])):
-      tmpOs = subPlots[i][j].oscstr[0]
-      tmpEn = np.asarray(subEnergy[i][j])
-      idxEn = np.where(tmpEn>fullEn[i][-1])
-      fullEn[i] = np.concatenate([fullEn[i],tmpEn[idxEn]])
-      fullOs[i] = np.concatenate([fullOs[i],tmpOs[idxEn]])
-  plots[i].make_spectrum("Full Spectrum", shifts[i]-5, max(fullEn[i]), fullEn[i], fullOs[i], 0.14, npoints=nPoints)
-  #plots[i].spectra_yscale = 1
+  plots[i].make_spectrum("Full Spectrum", enMin, enMax, fullEn[i], fullOs[i], 0.001, npoints=nPoints)
 
 #PLOTTING:
-colors = list(['tab:blue', 'blue', 'tab:red', 'tab:green', 'purple', 'black'])
-fig, ax = plt.subplots(len(fileList), sharex='col', figsize=[15,15], gridspec_kw={'hspace': 0},squeeze=False)
+colors = list(['tab:blue','tab:red', 'tab:green'])
+fig, ax = plt.subplots(1, sharex='col', figsize=[8,5], gridspec_kw={'hspace': 0},squeeze=False)
 
 for e,p in enumerate(plots):
-  for i, space in enumerate(space_names):
-    y = p.spectra[space]
-    x = np.linspace(shifts[e]-5, max(fullEn[e]), len(y))
-    if "Full" in space:
-      ax[e,0].plot(x-shifts[e], y, label=str(space), color='k', linewidth=2)
-    else:
-      ax[e,0].plot(x-shifts[e], y, label=str(space), color=colors[i], linewidth=4)
+  ##Plot MO contributions to excitations:
+  #for i, space in enumerate(space_names):
+  #  y = p.spectra[space]
+  #  x = np.linspace(enMin-5, enMax+5, len(y))
+  #  if "Full" in space:
+  #    ax[e,0].plot(x, y, label=str(space), color='k', linewidth=2)
+  #  else:
+  #    ax[e,0].plot(x, y, label=str(space), color=colors[i], linewidth=4)
   
-  #ax[e,0].set_yticks([])
-  ax[e,0].set_xlim([enMin,enMax])
-  ax[e,0].axhline(y=0, xmin=enMin, xmax=enMax, color='k')
-  #handles, labels = ax[e,0].get_legend_handles_labels()
-  ax[e,0].legend(loc='upper center', handlelength=0.5, frameon=False, 
-      prop=dict(size=15), ncol=6)
+  y = p.spectra["Full Spectrum"]
+  x = np.linspace(enMin, enMax, len(y))
+  ax[0,0].plot(x, y, label=names[e], color=colors[e], linewidth=4)
+  
+ax[0,0].set_yticks([])
+ax[0,0].set_xlim([enMax,enMin])
+ax[0,0].set_ylim([0.,None])
+ax[0,0].axhline(y=0, xmin=enMin, xmax=enMax)
+ax[0,0].legend(loc='upper left', handlelength=0.5, frameon=False, prop=dict(size=15))
 
-  ax[e,0].text(0.01, 0.9, names[e], ha='left', va='top', transform=ax[e,0].transAxes)
-  ax[e,0].text(0.99, 0.01, "+%.2f eV" %(shifts[e]), ha='right', va='bottom', transform=ax[e,0].transAxes)
-  
-  #for i, en in enumerate(oneparticle):
-  #  ax[e,0].axvline(x=en-init_peak, ymin=-1, ymax=1, color='gray', linestyle=':', 
-  #        alpha=0.5)
-  
-  #Final Energy
-  ax[e,0].axvline(x=fullEn[e][-1]-shifts[e], ymin=-1, ymax=1, color='yellow', linestyle='-.')
-  
-
-fig.add_subplot(111, frameon=False)
-plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
 plt.ylabel("Intensity (a.u.)", fontweight='bold')
 plt.xlabel("Energy (eV)", fontweight='bold')
-#fig.legend(handles, labels, loc='center right', handlelength=1.0, \
-#  frameon=False, prop=dict(size=15), ncol=1)
-#plt.subplots_adjust(left=0.1, right=0.8, top=0.99, bottom=0.1)
 fig.tight_layout()
 plt.savefig("Na.png")
   

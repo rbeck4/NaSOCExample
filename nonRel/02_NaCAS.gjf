@@ -1,10 +1,15 @@
-%chk=01_NaHF.chk
+%oldchk=01_NaHF.chk
+%chk=02_NaCAS.chk
 %nprocshared=40
 %mem=120GB
-#p nosymm gen ghf pop=full gfinput iop(3/33=1)
+#p nosymm gen gcasscf(9,16,nroot=8,stateaverage) guess=read
+pop=full gfinput iop(3/33=1)
+iop(5/7=1000) iop(5/17=210000000) iop(5/206=10) use=l513
 
-pop=full, gfinput, iop(3/33=1) selected to allow the canalyzer to do
-MO analysis of the resulting wavefunction
+Na CASSCF GHF reference (no Rel.)
+iop(5/7=N): n=-1 (ci); n=+N (casscf iterations) 
+iop(5/17=210000000): state-average, equal weights
+iop(5/206=10): compute spin expectation values
 
 0 2
   Na    0.  0.  0.
@@ -64,4 +69,5 @@ D    1   1.00
 D    1   1.00
       0.10000000000          1.0000000000
 ****
+
 
