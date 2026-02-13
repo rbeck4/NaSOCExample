@@ -1,15 +1,14 @@
-#Pray, pray to St. Isidore; may he have mercy on your poor soul for trying to
-#run something that I've written.
+#Plot the example .log files, as written will only display the total osc. stren.
+#for each excitation on one plot.  It can be modifed to show MO contributions.
 import matplotlib
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy
-import string
+import pathlib
 import sys
-sys.path.append("/home/ryan/canalyzer")
-#mac can eat an entire bag of ducks
-sys.path.append("/Users/ryan/canalyzer")
+
+#Presume you have the canalyzer project within your home directory, adjust 
+#here if you have it located elsewhere:
+sys.path.append(str(pathlib.Path.home()) + "/canalyzer")
 from CANalyzer.ci_spectra import CI_spectra
 
 font = { 
@@ -100,4 +99,3 @@ plt.ylabel("Intensity (a.u.)", fontweight='bold')
 plt.xlabel("Energy (eV)", fontweight='bold')
 fig.tight_layout()
 plt.savefig("Na.png")
-  
