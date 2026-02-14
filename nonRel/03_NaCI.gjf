@@ -1,8 +1,8 @@
 %oldchk=02_NaCAS.chk
 %chk=03_NaCI.chk
-%nprocshared=40
-%mem=520GB
-#p nosymm gen gcasscf(11,20,nroot=60) guess=read
+%nprocshared=1
+%mem=6GB
+#p nosymm gen gcasscf(9,16,nroot=8) guess=read
 pop=full gfinput iop(3/33=1)
 iop(5/7=-1) iop(5/203=2) iop(5/206=10) use=l513
 
