@@ -72,7 +72,7 @@ for i in range(len(fileList)):
   plots[i].make_spectrum("Full Spectrum", enMin, enMax, fullEn[i], fullOs[i], 0.001, npoints=nPoints)
 
 #PLOTTING:
-colors = list(['tab:blue','tab:red', 'tab:green'])
+colors = list(['tab:red', 'tab:blue', 'goldenrod'])
 fig, ax = plt.subplots(1, sharex='col', figsize=[8,5], gridspec_kw={'hspace': 0},squeeze=False)
 
 for e,p in enumerate(plots):
