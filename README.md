@@ -17,5 +17,5 @@ After running each file (and obtining the formated checkpoint file), the
 package, can be used to generate a plot showing the effect of including scalar 
 (SF-X2C) and spin-orbit (X2C) terms.
 
-![Na D-line](Na.png ""){width="200"}
+![Na D-line](Na.png "")
 
